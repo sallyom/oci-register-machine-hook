@@ -27,7 +27,7 @@ func main() {
 		log.Fatalf(err.Error())
 	}
 
-	if os.Args[0] ==  "prestart" {
+	if os.Args[0] == "prestart" {
 		if err = RegisterMachine(name, passId, int(pid), root_directory); err != nil {
 			log.Fatalf("Register machine failed: %v", err)
 		}
@@ -65,7 +65,11 @@ func RegisterMachine(name string, id string, pid int, root_directory string) err
 		return err
 	}
 	obj := conn.Object("org.freedesktop.machine1", "/org/freedesktop/machine1")
-	return obj.Call("org.freedesktop.machine1.Manager.RegisterMachine", 0, name, av, "runc.service", "container", uint32(pid), root_directory).Err
+	service := os.Getenv("container")
+	if service == "" {
+		service = "runc"
+	}
+	return obj.Call("org.freedesktop.machine1.Manager.RegisterMachine", 0, name, av, service, "container", uint32(pid), root_directory).Err
 	return nil
 }
 
