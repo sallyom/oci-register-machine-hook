@@ -10,7 +10,8 @@ prestart and poststop hooks.  `RegisterMachine()` and `TerminateMachine()` are s
 and other methods are described here: [systemd-machined freedesktop.org](http://www.freedesktop.org/wiki/Software/systemd/machined/)
 
 
-Running Docker containers with this executable, just before a container is started and after it is provisioned, RegisterMachine() is called.
+Running Docker containers with this executable, RegisterMachine() is called
+iust before a container is started and after it is provisioned.
 All running containers' IDs will be listed when you run the command `machinectl` or `machinectl list`.  When containers are
 stopped/exited, TerminateMachine() is called, all container processes are terminated and container ID is no longer listed in `machinectl` output.
 
@@ -18,7 +19,10 @@ stopped/exited, TerminateMachine() is called, all container processes are termin
 This doc assumes you are running at least docker version 1.9 with the dockerhooks patch. 
 
 
-To install these systemd-machined methods that work with Docker's prestart and poststop hooks (with yet-to-merge upstream
-changes):
+To install (will update when package is available):
 
-`sudo dnf install oci-registerMachine`
+    1. Clone this branch
+    2. cp oci-registerMachine.spec  ~/rpmbuild/SPECS
+    3. rpmbuild -ba oci-registerMachine.spec
+    4. sudo dnf install ~/rpmbuild/RPMS/x86_64/oci-registerMachine-1.0.0-1.fc23.x86_64.rpm
+       (or sudo dnf install [path to oci-registerMachine rpm])
