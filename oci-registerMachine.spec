@@ -1,4 +1,4 @@
-%global commit  6769278cbb35a79fcf13ed4b5a4f61821b7685d9
+%global commit  d5bcba2a0172637e3246f1be926656ab202fb786
 
 Name:   	      oci-registerMachine
 Version:        1.0.0	
