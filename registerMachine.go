@@ -51,7 +51,9 @@ func RegisterMachine(name string, id string, pid int, root_directory string) err
 		service = "runc"
 	}
 	log.Print("RegisterMachine: objCall")
-	return obj.Call("org.freedesktop.machine1.Manager.RegisterMachine", 0, name, av, service, "container", uint32(pid), root_directory).Err
+	/*	return obj.Call("org.freedesktop.machine1.Manager.RegisterMachine", 0, name[0:32], av, service, "container", uint32(pid), root_directory).Err
+	 */
+	return obj.Call("org.freedesktop.machine1.Manager.RegisterMachine", 0, name[0:32], av, service, "container", uint32(pid), "/").Err
 	return nil
 }
 
