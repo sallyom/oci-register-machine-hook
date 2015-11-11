@@ -1,0 +1,5 @@
+*.swp
+*~
+oci-registerMachine
+oci-registerMachine.1
+oci-registerMachine.1.gz
