@@ -8,23 +8,26 @@
 
 .PHONY:  all build install clean
 
-INSTALL_LOCATION="/usr/libexec/docker/hooks.d"
+PREFIX ?= $(DESTDIR)/usr
+HOOKSDIR=$(PREFIX)/libexec/docker/hooks.d
 CUR_DIR=$(PWD)
 
 # Build code
 #
 # Example:
 # 	make build
-build:
+oci-registerMachine: registerMachine.go
 	go build -v -o oci-registerMachine
+
+build: oci-registerMachine
 
 # Install code (change here to place anywhere you want)
 #
 # Example:
 #	sudo make install
-install:
-	mkdir -p /usr/libexec/docker/hooks.d
-	cp oci-registerMachine $(INSTALL_LOCATION)
+install: oci-registerMachine
+	install -d -m 0755 $(HOOKSDIR)
+	install -m 755 oci-registerMachine $(HOOKSDIR)
 
 # Clean up
 #
@@ -32,4 +35,3 @@ install:
 # 	make clean
 clean:
 	rm $(CUR_DIR)/oci-registerMachine
-
