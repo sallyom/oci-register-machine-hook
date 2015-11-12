@@ -11,7 +11,8 @@
 all: build docs
 
 PREFIX ?= $(DESTDIR)/usr
-HOOKSDIR=$(PREFIX)/libexec/docker/hooks.d
+HOOKSDIR=/usr/libexec/docker/hooks.d
+HOOKSINSTALLDIR=$(DESTDIR)$(HOOKSDIR)
 
 # Build code
 #
@@ -35,9 +36,10 @@ build: oci-registerMachine
 #
 # Example:
 #	make install
-install: oci-registerMachine
-	install -d -m 0755 $(HOOKSDIR)
-	install -m 755 oci-registerMachine $(HOOKSDIR)
+install: all
+	install -d -m 0755 $(HOOKSINSTALLDIR)
+	install -m 755 oci-registerMachine $(HOOKSINSTALLDIR)
+	install -d -m 0755 $(PREFIX)/share/man/man1
 	install oci-registerMachine.1.gz $(PREFIX)/share/man/man1
 
 # Clean up
