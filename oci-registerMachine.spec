@@ -20,24 +20,13 @@ RegisterMachine and TerminateMachine are called using prestart and poststop hook
 %prep
 %setup -q -n Register-%{version}
 
-rm -rf vendor
-
 %build
 mkdir -p ./_build/src/github.com/oci
 ln -s $(pwd) ./_build/src/github.com/oci/registerMachine
-
-export GOPATH=$(pwd)/_build:%{gopath}
-function gobuild { go build -a -ldflags "-B 0x$(head -c20 /dev/urandom|od -An -tx1|tr -d ' \n')" -v -x "$@"; }
-gobuild -o oci-registerMachine .
-go-md2man -in "oci-registerMachine.1.md" -out "oci-registerMachine.1"
-sed -i 's|$HOOKSDIR|%{hooksdir}|' oci-registerMachine.1
-gzip -f oci-registerMachine.1
+make 
 
 %install
-install -d %{buildroot}%{_libexecdir}/docker/hooks.d
-install -p -m 0755 ./oci-registerMachine %{buildroot}%{_libexecdir}/docker/hooks.d
-install -d %{buildroot}%{_mandir}/man1
-install -p -m 644 ./oci-registerMachine.1.gz %{buildroot}%{_mandir}/man1
+make DESTDIR="%{buildroot}" install
 
 %files
 %defattr(-,root,root,-)
