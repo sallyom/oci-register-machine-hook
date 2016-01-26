@@ -1,4 +1,4 @@
-# This is the Makefile for oci-registerMachine
+# This is the Makefile for oci-register-machine
 # Authors: Sally O'Malley <somalley@redhat.com>
 #
 # Targets (see each target for more information):
@@ -11,26 +11,26 @@
 all: build docs
 
 PREFIX ?= $(DESTDIR)/usr
-HOOKSDIR=/usr/libexec/docker/hooks.d
+HOOKSDIR=/usr/lib/docker/hooks.d
 HOOKSINSTALLDIR=$(DESTDIR)$(HOOKSDIR)
 
 # Build code
 #
 # Example:
 # 	make build
-oci-registerMachine: registerMachine.go
+oci-register-machine: oci-register-machine.go
 
-	go build -v -o oci-registerMachine
+	go build -v -o oci-register-machine
 
-oci-registerMachine.1.gz: oci-registerMachine.1.md
+oci-register-machine.1.gz: oci-register-machine.1.md
 
 	go get github.com/cpuguy83/go-md2man
-	go-md2man -in "oci-registerMachine.1.md" -out "oci-registerMachine.1"
-	sed -i 's|$$HOOKSDIR|$(HOOKSDIR)|' oci-registerMachine.1
-	gzip -f oci-registerMachine.1
+	go-md2man -in "oci-register-machine.1.md" -out "oci-register-machine.1"
+	sed -i 's|$$HOOKSDIR|$(HOOKSDIR)|' oci-register-machine.1
+	gzip -f oci-register-machine.1
 
-docs: oci-registerMachine.1.gz
-build: oci-registerMachine
+docs: oci-register-machine.1.gz
+build: oci-register-machine
 
 # Install code (change here to place anywhere you want)
 #
@@ -38,14 +38,14 @@ build: oci-registerMachine
 #	make install
 install: all
 	install -d -m 0755 $(HOOKSINSTALLDIR)
-	install -m 755 oci-registerMachine $(HOOKSINSTALLDIR)
+	install -m 755 oci-register-machine $(HOOKSINSTALLDIR)
 	install -d -m 0755 $(PREFIX)/share/man/man1
-	install oci-registerMachine.1.gz $(PREFIX)/share/man/man1
+	install oci-register-machine.1.gz $(PREFIX)/share/man/man1
 
 # Clean up
 #
 # Example:
 # 	make clean
 clean:
-	rm oci-registerMachine
-	rm oci-registerMachine.1.gz
+	rm oci-register-machine
+	rm oci-register-machine.1.gz
