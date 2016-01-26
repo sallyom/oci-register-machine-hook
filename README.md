@@ -5,8 +5,8 @@ tracks locally running virtual machines and containers and the processes belongi
 
 
 This project produces a golang binary that can be used with Docker (with minor code changes).
-If you clone this branch and build/install `registerMachine.go`, a binary will be placed in
-`/usr/libexec/docker/hooks.d` named `oci-registerMachine`. You can change this location by
+If you clone this branch and build/install `register-machine.go`, a binary will be placed in
+`/usr/libexec/docker/hooks.d` named `oci-register-machine`. You can change this location by
 editing `HOOKSDIR` in the Makefile.
 
 

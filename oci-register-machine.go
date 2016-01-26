@@ -50,7 +50,6 @@ func RegisterMachine(name string, id string, pid int, root_directory string) err
 	if service == "" {
 		service = "runc"
 	}
-	log.Print("RegisterMachine: objCall")
 	/*	return obj.Call("org.freedesktop.machine1.Manager.RegisterMachine", 0, name[0:32], av, service, "container", uint32(pid), root_directory).Err
 	 */
 	return obj.Call("org.freedesktop.machine1.Manager.RegisterMachine", 0, name[0:32], av, service, "container", uint32(pid), "/").Err
@@ -73,12 +72,11 @@ func TerminateMachine(name string) error {
 
 func main() {
 	var state State
-	logwriter, err := syslog.New(syslog.LOG_NOTICE, "ociRegisterMachine")
+	logwriter, err := syslog.New(syslog.LOG_NOTICE, "oci-register-machine")
 	if err == nil {
 		log.SetOutput(logwriter)
 	}
 	command := os.Args[1]
-	log.Print("oci register machine: ", command)
 	if err := json.NewDecoder(os.Stdin).Decode(&state); err != nil {
 		log.Fatalf("RegisterMachine Failed %v", err.Error())
 	}
