@@ -1,39 +1,172 @@
-%global hooksdir "/usr/lib/docker/hooks.d"
+%if 0%{?fedora}
+%global with_devel 1
+%global with_bundled 0
+%global with_debug 1
+%global with_check 1
+%global with_unit_test 0
+%else
+%global with_devel 0
+%global with_bundled 0
+%global with_debug 1
+# no test files so far
+%global with_check 0
+# no test files so far
+%global with_unit_test 0
+%endif
 
-Name:		oci-register-machine
-Version:	0.1.0	
-Release:	1%{?dist}
-Summary:	This is the golang binary RPM spec for using systemd-machined service methods RegisterMachine and TerminateMachine.
-License:	GPLv2.1+	
-URL:		https://github.com/projectatomic/oci-register-machine
-Source0:	https://github.com/projectatomic/oci-register-machine/archive/v%{version}.tar.gz
-    
-BuildRequires:  gcc
-BuildRequires:	golang >= 1.2-7
-BuildRequires:  golang-github-godbus-dbus-devel
-BuildRequires:  golang-github-cpuguy83-go-md2man
+%if 0%{?with_debug}
+%global _dwz_low_mem_die_limit 0
+%else
+%global debug_package   %{nil}
+%endif
+
+%global provider        github
+%global provider_tld    com
+%global project         projectatomic
+%global repo            oci-register-machine
+# https://github.com/projectatomic/oci-register-machine
+%global provider_prefix %{provider}.%{provider_tld}/%{project}/%{repo}
+%global import_path     %{provider_prefix}
+%global commit          686312e1597988906b044cdc404bde1a076afbc1
+%global shortcommit     %(c=%{commit}; echo ${c:0:7})
+
+Name:           oci-register-machine
+Version:        0
+Release:        0.1.git%{shortcommit}%{?dist}
+Summary:        Golang binary to register OCI containers with systemd-machined
+License:        ASL 2.0
+URL:            https://%{provider_prefix}
+Source0:        https://%{provider_prefix}/archive/%{commit}/%{repo}-%{shortcommit}.tar.gz
+
+# e.g. el6 has ppc64 arch without gcc-go, so EA tag is required
+ExclusiveArch:  %{?go_arches:%{go_arches}}%{!?go_arches:%{ix86} x86_64 %{arm}}
+# If go_compiler is not set to 1, there is no virtual provide. Use golang instead.
+BuildRequires:  %{?go_compiler:compiler(go-compiler)}%{!?go_compiler:golang}
+
+%if ! 0%{?with_bundled}
+BuildRequires:   golang(github.com/godbus/dbus)
+%endif
+BuildRequires:   golang-github-cpuguy83-go-md2man
 
 %description
-oci-register-machine implements a container manager that makes use of systemd-machined.
-RegisterMachine and TerminateMachine are called using prestart and poststop hooks.
+%{summary}
+
+%if 0%{?with_devel}
+%package devel
+Summary:       %{summary}
+BuildArch:     noarch
+Provides:      golang(%{import_path}) = %{version}-%{release}
+
+%if 0%{?with_check} && ! 0%{?with_bundled}
+%endif
+
+%description devel
+%{summary}
+
+This package contains the source files for
+building other packages which use import path with
+%{import_path} prefix.
+%endif
+
+%if 0%{?with_unit_test} && 0%{?with_devel}
+%package unit-test-devel
+Summary:         Unit tests for %{name} package
+%if 0%{?with_check}
+#Here comes all BuildRequires: PACKAGE the unit tests
+#in %%check section need for running
+%endif
+
+# test subpackage tests code from devel subpackage
+Requires:        %{name}-devel = %{version}-%{release}
+
+%description unit-test-devel
+%{summary}
+
+This package contains unit tests for project
+providing packages with %{import_path} prefix.
+%endif
 
 %prep
-%setup -q -n Register-%{version}
+%setup -q -n %{repo}-%{commit}
 
 %build
-mkdir -p ./_build/src/github.com/oci
-ln -s $(pwd) ./_build/src/github.com/oci/register-machine
-make 
+mkdir -p src/github.com/projectatomic
+ln -s ../../../ src/github.com/projectatomic/oci-register-machine
+
+%if ! 0%{?with_bundled}
+export GOPATH=$(pwd):%{gopath}
+%else
+export GOPATH=$(pwd):$(pwd)/Godeps/_workspace:%{gopath}
+%endif
+
+make %{?_smp_mflags}
 
 %install
-make DESTDIR="%{buildroot}" install
+install -d -p %{buildroot}%{_bindir}
+make DESTDIR=%{buildroot} install
+
+# source code for building projects
+%if 0%{?with_devel}
+install -d -p %{buildroot}/%{gopath}/src/%{import_path}/
+echo "%%dir %%{gopath}/src/%%{import_path}/." >> devel.file-list
+# find all *.go but no *_test.go files and generate devel.file-list
+for file in $(find . -iname "*.go" \! -iname "*_test.go") ; do
+    echo "%%dir %%{gopath}/src/%%{import_path}/$(dirname $file)" >> devel.file-list
+    install -d -p %{buildroot}/%{gopath}/src/%{import_path}/$(dirname $file)
+    cp -pav $file %{buildroot}/%{gopath}/src/%{import_path}/$file
+    echo "%%{gopath}/src/%%{import_path}/$file" >> devel.file-list
+done
+%endif
+
+# testing files for this project
+%if 0%{?with_unit_test} && 0%{?with_devel}
+install -d -p %{buildroot}/%{gopath}/src/%{import_path}/
+# find all *_test.go files and generate unit-test.file-list
+for file in $(find . -iname "*_test.go"); do
+    echo "%%dir %%{gopath}/src/%%{import_path}/$(dirname $file)" >> devel.file-list
+    install -d -p %{buildroot}/%{gopath}/src/%{import_path}/$(dirname $file)
+    cp -pav $file %{buildroot}/%{gopath}/src/%{import_path}/$file
+    echo "%%{gopath}/src/%%{import_path}/$file" >> unit-test-devel.file-list
+done
+%endif
+
+%if 0%{?with_devel}
+sort -u -o devel.file-list devel.file-list
+%endif
+
+%check
+%if 0%{?with_check} && 0%{?with_unit_test} && 0%{?with_devel}
+%if ! 0%{?with_bundled}
+export GOPATH=%{buildroot}/%{gopath}:%{gopath}
+%else
+export GOPATH=%{buildroot}/%{gopath}:$(pwd)/Godeps/_workspace:%{gopath}
+%endif
+
+%endif
+
+#define license tag if not already defined
+%{!?_licensedir:%global license %doc}
 
 %files
-%defattr(-,root,root,-)
-%doc README.md
+%license LICENSE
+%doc oci-register-machine.1.md README.md
+%dir %{_libdir}/docker/hooks.d
 %{_libdir}/docker/hooks.d/oci-register-machine
-%{_mandir}/man1/oci-register-machine.1.gz
+%{_mandir}/man1/oci-register-machine.1*
+
+%if 0%{?with_devel}
+%files devel -f devel.file-list
+%license LICENSE
+%doc oci-register-machine.1.md README.md
+%dir %{gopath}/src/%{provider}.%{provider_tld}/%{project}
+%endif
+
+%if 0%{?with_unit_test} && 0%{?with_devel}
+%files unit-test-devel -f unit-test-devel.file-list
+%license LICENSE
+%doc oci-register-machine.1.md README.md
+%endif
 
 %changelog
-* Tue Nov 03 2015 Sally O'Malley <somalley@redhat.com> - 1.0.0-1
-- package oci-register-machine
+* Thu Nov 19 2015 Sally O'Malley <somalley@redhat.com> - 0-0.1.git6863
+- First package for Fedora
