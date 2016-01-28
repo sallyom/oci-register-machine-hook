@@ -22,7 +22,7 @@ GOBUILD=go build -a -ldflags "-B 0x$(shell head -c20 /dev/urandom|od -An -tx1|tr
 # Example:
 #   make build
 oci-register-machine: oci-register-machine.go
-    $(GOBUILD) -o oci-register-machine .
+	$(GOBUILD) -o oci-register-machine .
 
 oci-register-machine.1: oci-register-machine.1.md
 
@@ -37,14 +37,14 @@ build: oci-register-machine
 # Example:
 #   make install
 install: oci-register-machine
-    install -d -m 755 $(HOOKSINSTALLDIR)
-    install -m 755 oci-register-machine $(HOOKSINSTALLDIR)
-    install -d -m 755 $(PREFIX)/share/man/man1
-    install -m 644 oci-register-machine.1 $(PREFIX)/share/man/man1
+	install -d -m 755 $(HOOKSINSTALLDIR)
+	install -m 755 oci-register-machine $(HOOKSINSTALLDIR)
+	install -d -m 755 $(PREFIX)/share/man/man1
+	install -m 644 oci-register-machine.1 $(PREFIX)/share/man/man1
 # Clean up
 #
 # Example:
 #   make clean
 clean:
-    rm oci-register-machine
-    rm oci-register-machine.1
+	rm oci-register-machine
+	rm oci-register-machine.1

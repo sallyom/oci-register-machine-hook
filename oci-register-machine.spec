@@ -27,7 +27,7 @@
 # https://github.com/projectatomic/oci-register-machine
 %global provider_prefix %{provider}.%{provider_tld}/%{project}/%{repo}
 %global import_path     %{provider_prefix}
-%global commit          ca2da259b45b86e547189bc5e7d1a746416fcff3
+%global commit          efe916793dba68cea814ed4ec9876853964cbcb4
 %global shortcommit     %(c=%{commit}; echo ${c:0:7})
 
 Name:           oci-register-machine
