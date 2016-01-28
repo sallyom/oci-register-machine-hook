@@ -26,8 +26,8 @@ oci-register-machine: oci-register-machine.go
 
 oci-register-machine.1: oci-register-machine.1.md
 
-    go-md2man -in "oci-register-machine.1.md" -out "oci-register-machine.1"
-    sed -i 's|$$HOOKSDIR|$(HOOKSDIR)|' oci-register-machine.1
+	go-md2man -in "oci-register-machine.1.md" -out "oci-register-machine.1"
+	sed -i 's|$$HOOKSDIR|$(HOOKSDIR)|' oci-register-machine.1
 
 docs: oci-register-machine.1
 build: oci-register-machine
