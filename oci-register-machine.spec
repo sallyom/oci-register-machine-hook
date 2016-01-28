@@ -27,7 +27,7 @@
 # https://github.com/projectatomic/oci-register-machine
 %global provider_prefix %{provider}.%{provider_tld}/%{project}/%{repo}
 %global import_path     %{provider_prefix}
-%global commit          686312e1597988906b044cdc404bde1a076afbc1
+%global commit          2a4fc1db4b2e3442efd49cf76e5c197d9bee6d25
 %global shortcommit     %(c=%{commit}; echo ${c:0:7})
 
 Name:           oci-register-machine
@@ -150,8 +150,8 @@ export GOPATH=%{buildroot}/%{gopath}:$(pwd)/Godeps/_workspace:%{gopath}
 %files
 %license LICENSE
 %doc oci-register-machine.1.md README.md
-%dir %{_libdir}/docker/hooks.d
-%{_libdir}/docker/hooks.d/oci-register-machine
+%dir %{_libexecdir}/docker/hooks.d
+%{_libexecdir}/docker/hooks.d/oci-register-machine
 %{_mandir}/man1/oci-register-machine.1*
 
 %if 0%{?with_devel}
