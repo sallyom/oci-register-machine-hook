@@ -22,7 +22,7 @@ GOBUILD=go build -a -ldflags "-B 0x$(shell head -c20 /dev/urandom|od -An -tx1|tr
 # Example:
 #   make build
 oci-register-machine: oci-register-machine.go
-	$(GOBUILD) -o oci-register-machine .
+	$(GOBUILD) -o oci-register-machine
 
 oci-register-machine.1: oci-register-machine.1.md
 	go-md2man -in "oci-register-machine.1.md" -out "oci-register-machine.1"
