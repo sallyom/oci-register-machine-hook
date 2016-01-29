@@ -12,7 +12,7 @@
 all: build docs
 
 PREFIX ?= $(DESTDIR)/usr
-HOOKSDIR=/usr/libexec/docker/hooks.d
+HOOKSDIR=/usr/lib/docker/hooks.d
 HOOKSINSTALLDIR=$(DESTDIR)$(HOOKSDIR)
 # need this substitution to get build ID note
 GOBUILD=go build -a -ldflags "-B 0x$(shell head -c20 /dev/urandom|od -An -tx1|tr -d ' \n')" 
@@ -25,7 +25,6 @@ oci-register-machine: oci-register-machine.go
 	$(GOBUILD) -o oci-register-machine .
 
 oci-register-machine.1: oci-register-machine.1.md
-
 	go-md2man -in "oci-register-machine.1.md" -out "oci-register-machine.1"
 	sed -i 's|$$HOOKSDIR|$(HOOKSDIR)|' oci-register-machine.1
 
