@@ -35,7 +35,7 @@ build: oci-register-machine
 #
 # Example:
 #   make install
-install: oci-register-machine
+install: oci-register-machine oci-register-machine.1
 	install -d -m 755 $(HOOKSINSTALLDIR)
 	install -m 755 oci-register-machine $(HOOKSINSTALLDIR)
 	install -d -m 755 $(PREFIX)/share/man/man1
